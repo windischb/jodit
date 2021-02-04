@@ -17,7 +17,8 @@ import type {
 	IUploaderAnswer,
 	IUploaderData,
 	IUploaderOptions,
-	IViewBased
+	IViewBased,
+	IViewOptions
 } from '../../types';
 import { Config } from '../../config';
 import { IS_IE, TEXT_PLAIN } from '../../core/constants';
@@ -225,7 +226,7 @@ export class Uploader extends ViewComponent implements IUploader {
 			sendData = (
 				request: FormData | IDictionary<string> | string
 			): Promise<any> => {
-				const ajax = new Ajax(this.j || this, {
+				const ajax = new Ajax(this.j || (this as unknown as IViewBased<IViewOptions>), {
 					xhr: () => {
 						const xhr = new XMLHttpRequest();
 
