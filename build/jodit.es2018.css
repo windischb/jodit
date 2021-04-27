@@ -3891,7 +3891,7 @@ svg.jodit-icon {
   min-width: 80px;
 }
 .jodit-tabs__button_columns_3 {
-  width: 100% / 3;
+  width: 33.33333333%;
 }
 .jodit-tabs__button_columns_2 {
   width: 50%;
