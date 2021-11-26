@@ -20557,6 +20557,7 @@ class Uploader extends component/* ViewComponent */.Hr {
             }
         }
         fileList = fileList.filter(a => a);
+        let upload;
         if (fileList.length) {
             const form = new FormData();
             form.append(this.o.pathVariableName, uploader.path);
@@ -20590,8 +20591,8 @@ class Uploader extends component/* ViewComponent */.Hr {
                     form.append(key, uploader.o.data[key]);
                 });
             }
-            uploader.o.prepareData.call(this, form);
-            promises.push(uploader
+            promises.push(Promise.resolve(uploader.o.prepareData.call(this, form)));
+            upload = () => (uploader
                 .send(form, (resp) => {
                 if (this.o.isSuccess.call(uploader, resp)) {
                     if (typeof (handlerSuccess ||
@@ -20615,7 +20616,7 @@ class Uploader extends component/* ViewComponent */.Hr {
                 this.j.events && this.j.e.fire('filesWereUploaded');
             }));
         }
-        return Promise.all(promises);
+        return Promise.all(promises).then(() => upload === null || upload === void 0 ? void 0 : upload());
     }
     setPath(path) {
         this.path = path;
@@ -26701,6 +26702,7 @@ config/* Config.prototype.link */.D.prototype.link = {
     processPastedLink: true,
     noFollowCheckbox: true,
     openInNewTabCheckbox: true,
+    openInNewTab: true,
     modeClassName: 'input',
     selectMultipleClassName: true,
     selectSizeClassName: 3,
@@ -26795,7 +26797,7 @@ class link_link extends Plugin {
     }
     generateForm(current, close) {
         const { jodit } = this;
-        const i18n = jodit.i18n.bind(jodit), { openInNewTabCheckbox, noFollowCheckbox, formTemplate, formClassName, modeClassName } = jodit.o.link;
+        const i18n = jodit.i18n.bind(jodit), { openInNewTabCheckbox, openInNewTab, noFollowCheckbox, formTemplate, formClassName, modeClassName } = jodit.o.link;
         const html = formTemplate(jodit), form = (0,helpers.isString)(html)
             ? jodit.c.fromHTML(html, {
                 target_checkbox_box: openInNewTabCheckbox,
@@ -26961,8 +26963,10 @@ class link_link extends Plugin {
                         a.textContent = newContent;
                     }
                 }
-                if (openInNewTabCheckbox && target_checkbox) {
-                    (0,helpers.attr)(a, 'target', target_checkbox.checked ? '_blank' : null);
+                if ((openInNewTabCheckbox && target_checkbox) || openInNewTab) {
+                    const shouldBeOpenendInNewTab = (!target_checkbox && openInNewTab) ||
+                        (target_checkbox === null || target_checkbox === void 0 ? void 0 : target_checkbox.checked);
+                    (0,helpers.attr)(a, 'target', shouldBeOpenendInNewTab ? '_blank' : null);
                 }
                 if (noFollowCheckbox && nofollow_checkbox) {
                     (0,helpers.attr)(a, 'rel', nofollow_checkbox.checked ? 'nofollow' : null);

@@ -64,6 +64,7 @@ declare module 'jodit/config' {
 			 * Show `Open in new tab` checkbox in link dialog.
 			 */
 			openInNewTabCheckbox: boolean;
+			openInNewTab: boolean;
 
 			/**
 			 * Use an input text to ask the classname or a select or not ask
@@ -97,6 +98,7 @@ Config.prototype.link = {
 	processPastedLink: true,
 	noFollowCheckbox: true,
 	openInNewTabCheckbox: true,
+	openInNewTab: true,
 	modeClassName: 'input',
 	selectMultipleClassName: true,
 	selectSizeClassName: 3,
@@ -236,6 +238,7 @@ export class link extends Plugin {
 		const i18n = jodit.i18n.bind(jodit),
 			{
 				openInNewTabCheckbox,
+				openInNewTab,
 				noFollowCheckbox,
 				formTemplate,
 				formClassName,
@@ -470,11 +473,14 @@ export class link extends Plugin {
 					}
 				}
 
-				if (openInNewTabCheckbox && target_checkbox) {
+				if ((openInNewTabCheckbox && target_checkbox) || openInNewTab) {
+					const shouldBeOpenendInNewTab =
+						(!target_checkbox && openInNewTab) ||
+						target_checkbox?.checked;
 					attr(
 						a,
 						'target',
-						target_checkbox.checked ? '_blank' : null
+						shouldBeOpenendInNewTab ? '_blank' : null
 					);
 				}
 

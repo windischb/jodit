@@ -386,7 +386,7 @@ export class Uploader extends ViewComponent implements IUploader {
 		}
 
 		fileList = fileList.filter(a => a);
-
+		let upload: (() => Promise<any>) | undefined;
 		if (fileList.length) {
 			const form: FormData = new FormData();
 
@@ -440,9 +440,11 @@ export class Uploader extends ViewComponent implements IUploader {
 				});
 			}
 
-			uploader.o.prepareData.call(this, form);
-
 			promises.push(
+				Promise.resolve(uploader.o.prepareData.call(this, form))
+			);
+
+			upload = () => (
 				uploader
 					.send(form, (resp: IUploaderAnswer) => {
 						if (this.o.isSuccess.call(uploader, resp)) {
@@ -493,8 +495,7 @@ export class Uploader extends ViewComponent implements IUploader {
 					})
 			);
 		}
-
-		return Promise.all(promises);
+		return Promise.all(promises).then(() => upload?.());
 	}
 
 	/**

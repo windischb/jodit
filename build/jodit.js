@@ -21102,6 +21102,7 @@ var Uploader = (function (_super) {
             }
         }
         fileList = fileList.filter(function (a) { return a; });
+        var upload;
         if (fileList.length) {
             var form_1 = new FormData();
             form_1.append(this.o.pathVariableName, uploader.path);
@@ -21135,8 +21136,8 @@ var Uploader = (function (_super) {
                     form_1.append(key, uploader.o.data[key]);
                 });
             }
-            uploader.o.prepareData.call(this, form_1);
-            promises.push(uploader
+            promises.push(Promise.resolve(uploader.o.prepareData.call(this, form_1)));
+            upload = function () { return (uploader
                 .send(form_1, function (resp) {
                 if (_this.o.isSuccess.call(uploader, resp)) {
                     if (typeof (handlerSuccess ||
@@ -21158,9 +21159,9 @@ var Uploader = (function (_super) {
             })
                 .then(function () {
                 _this.j.events && _this.j.e.fire('filesWereUploaded');
-            }));
+            })); };
         }
-        return Promise.all(promises);
+        return Promise.all(promises).then(function () { return upload === null || upload === void 0 ? void 0 : upload(); });
     };
     Uploader.prototype.setPath = function (path) {
         this.path = path;
