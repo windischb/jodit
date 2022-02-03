@@ -31941,6 +31941,7 @@ config_1.Config.prototype.link = {
     processPastedLink: true,
     noFollowCheckbox: true,
     openInNewTabCheckbox: true,
+    openInNewTab: true,
     modeClassName: 'input',
     selectMultipleClassName: true,
     selectSizeClassName: 3,
@@ -32038,7 +32039,7 @@ var link = (function (_super) {
     };
     link.prototype.generateForm = function (current, close) {
         var jodit = this.jodit;
-        var i18n = jodit.i18n.bind(jodit), _a = jodit.o.link, openInNewTabCheckbox = _a.openInNewTabCheckbox, noFollowCheckbox = _a.noFollowCheckbox, formTemplate = _a.formTemplate, formClassName = _a.formClassName, modeClassName = _a.modeClassName;
+        var i18n = jodit.i18n.bind(jodit), _a = jodit.o.link, openInNewTabCheckbox = _a.openInNewTabCheckbox, openInNewTab = _a.openInNewTab, noFollowCheckbox = _a.noFollowCheckbox, formTemplate = _a.formTemplate, formClassName = _a.formClassName, modeClassName = _a.modeClassName;
         var html = formTemplate(jodit), form = (0, helpers_1.isString)(html)
             ? jodit.c.fromHTML(html, {
                 target_checkbox_box: openInNewTabCheckbox,
@@ -32206,8 +32207,10 @@ var link = (function (_super) {
                         a.textContent = newContent;
                     }
                 }
-                if (openInNewTabCheckbox && target_checkbox) {
-                    (0, helpers_1.attr)(a, 'target', target_checkbox.checked ? '_blank' : null);
+                if ((openInNewTabCheckbox && target_checkbox) || openInNewTab) {
+                    var shouldBeOpenendInNewTab = (!target_checkbox && openInNewTab) ||
+                        (target_checkbox === null || target_checkbox === void 0 ? void 0 : target_checkbox.checked);
+                    (0, helpers_1.attr)(a, 'target', shouldBeOpenendInNewTab ? '_blank' : null);
                 }
                 if (noFollowCheckbox && nofollow_checkbox) {
                     (0, helpers_1.attr)(a, 'rel', nofollow_checkbox.checked ? 'nofollow' : null);
