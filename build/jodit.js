@@ -17137,6 +17137,7 @@ var Uploader = (function (_super) {
             }
         }
         fileList = fileList.filter(function (a) { return a; });
+        var upload;
         if (fileList.length) {
             var form_1 = new FormData();
             form_1.append(this.o.pathVariableName, uploader.path);
@@ -17170,8 +17171,8 @@ var Uploader = (function (_super) {
                     form_1.append(key, uploader.o.data[key]);
                 });
             }
-            uploader.o.prepareData.call(this, form_1);
-            promises.push(uploader
+            promises.push(Promise.resolve(uploader.o.prepareData.call(this, form_1)));
+            upload = function () { return (uploader
                 .send(form_1, function (resp) {
                 if (_this.o.isSuccess.call(uploader, resp)) {
                     if (typeof (handlerSuccess ||
@@ -17193,9 +17194,9 @@ var Uploader = (function (_super) {
             })
                 .then(function () {
                 _this.j.events && _this.j.e.fire('filesWereUploaded');
-            }));
+            })); };
         }
-        return Promise.all(promises);
+        return Promise.all(promises).then(function () { return upload === null || upload === void 0 ? void 0 : upload(); });
     };
     Uploader.prototype.setPath = function (path) {
         this.path = path;
@@ -27709,6 +27710,7 @@ config_1.Config.prototype.link = {
     processPastedLink: true,
     noFollowCheckbox: true,
     openInNewTabCheckbox: true,
+    openInNewTab: true,
     modeClassName: 'input',
     selectMultipleClassName: true,
     selectSizeClassName: 3,
@@ -27805,7 +27807,7 @@ var link = (function (_super) {
     };
     link.prototype.generateForm = function (current, close) {
         var jodit = this.jodit;
-        var i18n = jodit.i18n.bind(jodit), _a = jodit.o.link, openInNewTabCheckbox = _a.openInNewTabCheckbox, noFollowCheckbox = _a.noFollowCheckbox, formTemplate = _a.formTemplate, formClassName = _a.formClassName, modeClassName = _a.modeClassName;
+        var i18n = jodit.i18n.bind(jodit), _a = jodit.o.link, openInNewTabCheckbox = _a.openInNewTabCheckbox, openInNewTab = _a.openInNewTab, noFollowCheckbox = _a.noFollowCheckbox, formTemplate = _a.formTemplate, formClassName = _a.formClassName, modeClassName = _a.modeClassName;
         var html = formTemplate(jodit), form = helpers_1.isString(html)
             ? jodit.c.fromHTML(html, {
                 target_checkbox_box: openInNewTabCheckbox,
@@ -27965,8 +27967,10 @@ var link = (function (_super) {
                         a.textContent = url_input.value;
                     }
                 }
-                if (openInNewTabCheckbox && target_checkbox) {
-                    helpers_1.attr(a, 'target', target_checkbox.checked ? '_blank' : null);
+                if ((openInNewTabCheckbox && target_checkbox) || openInNewTab) {
+                    var shouldBeOpenendInNewTab = (!target_checkbox && openInNewTab) ||
+                        (target_checkbox === null || target_checkbox === void 0 ? void 0 : target_checkbox.checked);
+                    helpers_1.attr(a, 'target', shouldBeOpenendInNewTab ? '_blank' : null);
                 }
                 if (noFollowCheckbox && nofollow_checkbox) {
                     helpers_1.attr(a, 'rel', nofollow_checkbox.checked ? 'nofollow' : null);
