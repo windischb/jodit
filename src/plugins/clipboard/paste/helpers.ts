@@ -73,20 +73,24 @@ export function pasteInsertHtml(
 		);
 	}
 
-	const result = editor.e.fire('beforePasteInsert', html);
+	const resultOrPromise = editor.e.fire('beforePasteInsert', html);
 
-	if (
-		!isVoid(result) &&
-		(isString(result) || isNumber(result) || Dom.isNode(result, editor.ew))
-	) {
-		html = result;
-	}
+	Promise.resolve(resultOrPromise).then((result) => {
+		if (
+			!isVoid(result) &&
+			(isString(result) || isNumber(result) || Dom.isNode(result, editor.ew))
+		) {
+			html = result;
+		}
 
-	if (isString(html)) {
-		html = removeExtraFragments(html);
-	}
+		if (isString(html)) {
+			html = removeExtraFragments(html);
+		}
 
-	editor.s.insertHTML(html);
+		editor.s.insertHTML(html);
+	});
+
+
 }
 
 /**
